@@ -1,3 +1,5 @@
+import { TweetProvider } from "./tweets/contexts/TweetProvider";
+import { PublishTweetPage } from "./tweets/pages/PublishTweetPage";
 import { NavBar } from "./ui/components/NavBar";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { HomeProvider } from "./home/contexts/HomeProvider";
@@ -12,15 +14,18 @@ const PendingPage = ({ title }: { title: string }) => (
 
 export const ClonApp = () => (
     <HomeProvider>
+    <TweetProvider>
         <NavBar />
         <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/tweet" element={<PendingPage title="Publicar tweet" />} />
+            <Route path="/tweet" element={<PublishTweetPage />} />
             <Route path="/feed" element={<PendingPage title="Feed" />} />
             <Route path="/seguidos" element={<PendingPage title="Seguidos" />} />
             <Route path="/seguidores" element={<PendingPage title="Seguidores" />} />
             <Route path="/usuarios/:userId/tweets" element={<PendingPage title="Tweets del usuario" />} />
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </TweetProvider>
     </HomeProvider>
 );
+
