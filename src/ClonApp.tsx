@@ -1,3 +1,5 @@
+import { UserTweetsProvider } from "./userTweets/contexts/UserTweetsProvider";
+import { UserTweetsPage } from "./userTweets/pages/UserTweetsPage";
 import { FollowersProvider } from "./followers/contexts/FollowersProvider";
 import { FollowersPage } from "./followers/pages/FollowersPage";
 import { FollowingProvider } from "./following/contexts/FollowingProvider";
@@ -26,12 +28,13 @@ export const ClonApp = () => (
             <Route path="/feed" element={<PendingPage title="Feed" />} />
             <Route path="/seguidos" element={<FollowingProvider><FollowingPage /></FollowingProvider>} />
             <Route path="/seguidores" element={<FollowersProvider><FollowersPage /></FollowersProvider>} />
-            <Route path="/usuarios/:userId/tweets" element={<PendingPage title="Tweets del usuario" />} />
+            <Route path="/usuarios/:userId/tweets" element={<UserTweetsProvider><UserTweetsPage /></UserTweetsProvider>} />
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </TweetProvider>
     </HomeProvider>
 );
+
 
 
 
