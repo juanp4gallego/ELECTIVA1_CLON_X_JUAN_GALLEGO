@@ -1,4 +1,6 @@
-import { useReducer, type ReactNode } from "react"
+import { onAuthStateChanged, signOut } from "firebase/auth"
+import { FirebaseAuth } from "../../firebase/config"
+import { useEffect, useReducer, useState, type ReactNode } from "react"
 import { AuthContext } from "./AuthContext"
 import { AuthReducer } from "../reducers/AuthReducer"
 import type { AuthReducerAction, AuthState, User } from "../types/AuthReducerInterfaces"
@@ -16,11 +18,35 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const [authState, dispatch] = useReducer(AuthReducer, initialState)
+    const [checkingSession, setCheckingSession] = useState(true);
+
+    useEffect(() => {
+        return onAuthStateChanged(FirebaseAuth, (firebaseUser) => {
+            dispatch({
+                type: firebaseUser ? "login" : "logout",
+                payload: {
+                    logged: !!firebaseUser,
+                    user: firebaseUser ? {
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email ?? "",
+                        photoURL: firebaseUser.photoURL ?? "",
+                        username: firebaseUser.displayName ?? "",
+                    } : null,
+                    errorMessage: null,
+                },
+            });
+            setCheckingSession(false);
+        }, () => {
+            dispatch({ type: "logout", payload: { logged: false, user: null, errorMessage: null } });
+            setCheckingSession(false);
+        });
+    }, []);
 
     const login = async (email: string, password: string): Promise<boolean> => {
 
-        const { ok, uid, photoURL, displayName, errorMessage } = await loginUserByCredentials(email, password)
-        if (ok) {
+        const result = await loginUserByCredentials(email, password)
+        if ("uid" in result) {
+            const { uid, photoURL, displayName } = result;
             const user = {
                 uid,
                 email,
@@ -44,7 +70,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 payload : {
                     logged : false,
                     user : null,
-                    errorMessage: errorMessage
+                    errorMessage: result.errorMessage
                 }
             } as AuthReducerAction
 
@@ -53,7 +79,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     }
 
-    const logout = () : boolean => {
+    const logout = async () : Promise<boolean> => {
+        try {
+            await signOut(FirebaseAuth);
+        } catch {
+            return false;
+        }
         dispatch({
             type: "logout",
             payload: {
@@ -66,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     return (
-        <AuthContext.Provider value={{ authState, login, logout }}>
+        <AuthContext.Provider value={{ authState, checkingSession, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

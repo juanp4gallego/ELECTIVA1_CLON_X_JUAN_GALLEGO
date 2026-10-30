@@ -8,7 +8,8 @@ export const AuthReducer = ( state : AuthState, action : AuthReducerAction ) => 
             return {
                 ... state,
                 logged : true,
-                user: action.payload.user
+                user: action.payload.user,
+                errorMessage: null
             }
             
         case "logout":
