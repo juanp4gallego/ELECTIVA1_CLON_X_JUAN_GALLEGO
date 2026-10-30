@@ -1,3 +1,5 @@
+import { FeedProvider } from "./feed/contexts/FeedProvider";
+import { FeedPage } from "./feed/pages/FeedPage";
 import { UserTweetsProvider } from "./userTweets/contexts/UserTweetsProvider";
 import { UserTweetsPage } from "./userTweets/pages/UserTweetsPage";
 import { FollowersProvider } from "./followers/contexts/FollowersProvider";
@@ -11,12 +13,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { HomeProvider } from "./home/contexts/HomeProvider";
 import { HomePage } from "./home/pages/HomePage";
 
-const PendingPage = ({ title }: { title: string }) => (
-    <div className="container mt-4">
-        <h2>{title}</h2>
-        <p>Esta página está pendiente de desarrollar.</p>
-    </div>
-);
+
 
 export const ClonApp = () => (
     <HomeProvider>
@@ -25,7 +22,7 @@ export const ClonApp = () => (
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/tweet" element={<PublishTweetPage />} />
-            <Route path="/feed" element={<PendingPage title="Feed" />} />
+            <Route path="/feed" element={<FeedProvider><FeedPage /></FeedProvider>} />
             <Route path="/seguidos" element={<FollowingProvider><FollowingPage /></FollowingProvider>} />
             <Route path="/seguidores" element={<FollowersProvider><FollowersPage /></FollowersProvider>} />
             <Route path="/usuarios/:userId/tweets" element={<UserTweetsProvider><UserTweetsPage /></UserTweetsProvider>} />
@@ -34,6 +31,7 @@ export const ClonApp = () => (
         </TweetProvider>
     </HomeProvider>
 );
+
 
 
 
