@@ -1,9 +1,26 @@
-import { NavBar } from "./ui/components/NavBar"
+import { NavBar } from "./ui/components/NavBar";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { HomeProvider } from "./home/contexts/HomeProvider";
+import { HomePage } from "./home/pages/HomePage";
 
-export const ClonApp = () => {
-  return (
-    <>  
-    <NavBar/>
-    </>
-  )
-}
+const PendingPage = ({ title }: { title: string }) => (
+    <div className="container mt-4">
+        <h2>{title}</h2>
+        <p>Esta página está pendiente de desarrollar.</p>
+    </div>
+);
+
+export const ClonApp = () => (
+    <HomeProvider>
+        <NavBar />
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/tweet" element={<PendingPage title="Publicar tweet" />} />
+            <Route path="/feed" element={<PendingPage title="Feed" />} />
+            <Route path="/seguidos" element={<PendingPage title="Seguidos" />} />
+            <Route path="/seguidores" element={<PendingPage title="Seguidores" />} />
+            <Route path="/usuarios/:userId/tweets" element={<PendingPage title="Tweets del usuario" />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    </HomeProvider>
+);

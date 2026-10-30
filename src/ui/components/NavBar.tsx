@@ -6,8 +6,8 @@ export const NavBar = () => {
     const { authState, logout } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const onLogoutButton = () => {
-        if (logout()) navigate("/login", { replace: true });
+    const onLogoutButton = async () => {
+        if (await logout()) navigate("/login", { replace: true });
     };
 
 
@@ -39,3 +39,4 @@ export const NavBar = () => {
         </nav>
     );
 }
+
