@@ -1,0 +1,81 @@
+.interact-app { display: flex; min-height: 100vh; background: #1a1a1a; color: #eaecef; }
+.interact-sidebar { width: 250px; flex-shrink: 0; background: #303030; padding: 28px 24px; border-right: 1px solid #484848; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+.interact-brand { color: #fff; font-size: 26px; font-weight: 800; text-decoration: none; letter-spacing: -1px; margin-bottom: 30px; }
+.interact-brand span { color: #9437e6; }
+.interact-sidebar .nav-link { color: #eaecef; display: flex; gap: 14px; padding: 12px 8px; }
+.interact-sidebar .nav-link.active { color: #b56bf5; border-left: 3px solid #8a2be2; background: #ffffff05; }
+.interact-button { background: #8515df; color: #fff; border: 1px solid #8515df; padding: 9px 22px; }
+.interact-button:hover { background: #6b0dba; color: #fff; }
+.interact-main { width: 100%; max-width: 850px; min-width: 0; border-right: 1px solid #363636; }
+.sidebar-account { margin-top: auto; padding-top: 28px; }
+.feed-tabs { border-bottom: 1px solid #444; padding: 0 16px; }
+.feed-tabs button { color: #aaa; background: transparent; border: 0; padding: 20px 12px 14px; font-weight: 600; }
+.feed-tabs button.active { color: #fff; border-bottom: 2px solid #8a2be2; }
+.interact-app .post-card, .interact-app .post-composer { background: #303030; color: #eaecef; border: 0; border-radius: 12px; }
+.interact-app .post-composer textarea { background: transparent; border: 0; color: #fff; resize: vertical; box-shadow: none; }
+.interact-app .post-composer textarea::placeholder { color: #bcbcbc; }
+.post-secondary { color: #eaecef; border: 1px solid #666; background: transparent; }
+.post-secondary:hover { color: #fff; background: #444; }
+.post-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #58008f; display: inline-flex; align-items: center; justify-content: center; }
+.post-name { color: #fff; font-weight: 600; text-decoration: none; }
+.post-name:hover { text-decoration: underline; }
+.post-muted { color: #bcbcbc; }
+.post-body { min-width: 0; flex: 1; }
+.post-text { white-space: pre-wrap; }
+.post-media { display: block; width: 100%; max-height: 450px; object-fit: contain; border-radius: 8px; }
+.post-file { color: #cf9aff; overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+    .interact-app { flex-direction: column; }
+    .interact-sidebar { width: 100%; height: auto; position: static; padding: 16px; }
+    .interact-sidebar .nav { flex-direction: row !important; flex-wrap: wrap; gap: 4px !important; }
+    .interact-sidebar .nav-link { padding: 8px; font-size: 13px; }
+    .interact-brand { margin-bottom: 12px; }
+    .sidebar-account { padding-top: 16px; }
+    .interact-main { max-width: none; }
+}
+
+/* Fond et disposition de la communauté */
+.interact-app { background: #191919 url("/images/community-background.svg") center top / 100% auto fixed; }
+.interact-sidebar { width: 265px; overflow-y: auto; background: #2d2d2d url("/images/community-background.svg") left bottom / 500px auto no-repeat; }
+.interact-brand { display: block; text-align: center; width: 100%; }
+.interact-main { flex: 1; max-width: none; border-right: 0; padding: 0 28px 40px; }
+.interact-main > main { max-width: 720px; margin: 0 auto; width: 100%; }
+.interact-app .post-card .card-body { display: flex; flex-direction: row; align-items: flex-start; gap: 12px; padding: 18px; }
+.interact-app .post-composer .card-body { padding: 18px; }
+.interact-app .post-card, .interact-app .post-composer { border: 1px solid #3b3b3b; }
+.follow-recommendations { border-top: 1px solid #494049; padding-top: 20px; }
+.recommendation-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; }
+.recommendation-name { font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
+.recommendation-row button { flex-shrink: 0; font-size: 12px; border-radius: 20px; padding: 4px 10px; }
+@media (max-width: 767px) {
+    .interact-sidebar { width: 100%; overflow-y: visible; }
+    .interact-main { padding: 0 0 24px; }
+    .follow-recommendations { margin-top: 16px !important; }
+}
+
+.post-modal { width: min(620px, calc(100% - 32px)); max-height: 90dvh; margin: auto; padding: 0; border: 1px solid #505050; border-radius: 14px; background: #252525; color: #eaecef; overflow-y: auto; }
+.post-modal::backdrop { background: #000a; }
+.post-modal .modal-content { background: #252525; color: #eaecef; border: 0; }
+.post-modal .modal-header { border-bottom: 1px solid #444; }
+.post-modal .post-composer { background: #303030; border: 0; }
+.post-modal textarea { background: transparent; color: #fff; border-color: #555; }
+.post-modal textarea::placeholder { color: #bcbcbc; }
+
+.profile-page-heading { padding: 22px 20px 14px; border-bottom: 1px solid #444; }
+.profile-page-heading h1 { display: inline-block; position: relative; font-weight: 600; }
+.profile-page-heading h1::after { content: ""; position: absolute; height: 2px; background: #8a2be2; left: 0; right: 0; bottom: -15px; }
+.interact-app .profile-card { background: #303030; border: 1px solid #393939; border-radius: 12px; color: #eaecef; overflow: hidden; }
+.profile-cover { height: 85px; background: #2e1054; }
+.profile-details { position: relative; padding: 0 20px 20px; min-height: 72px; }
+.profile-avatar { position: absolute; top: -55px; left: 20px; width: 84px; height: 84px; border-radius: 50%; border: 3px solid #303030; object-fit: cover; background: #58008f; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.profile-identity { margin-left: 100px; padding-top: 10px; min-height: 48px; overflow-wrap: anywhere; }
+.profile-stats { display: flex; border-top: 1px solid #484848; margin: 0 16px; padding: 16px 0; gap: 12px; }
+.profile-stats > a, .profile-stats > div { display: flex; gap: 10px; align-items: center; flex: 1; color: #eaecef; text-decoration: none; font-size: 12px; }
+.profile-stats strong { display: block; font-size: 20px; line-height: 1.3; }
+.profile-stat-icon { background: #7418bb; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 50%; font-size: 20px; }
+@media (max-width: 420px) {
+    .profile-stats { gap: 8px; margin: 0 12px; }
+    .profile-stat-icon { display: none; }
+    .profile-identity { margin-left: 84px; }
+    .profile-avatar { width: 70px; height: 70px; left: 16px; }
+}

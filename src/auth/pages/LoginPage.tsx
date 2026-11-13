@@ -1,85 +1,73 @@
+import { AuthIcon } from "./AuthIcon";
 import { Alert } from "../../ui/components/Alert";
-import { useContext, useState, type ChangeEvent } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
-const initialForm = {
-    email: '',
-    password: ''
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import { AuthLayout } from "./AuthLayout";
 
 export const LoginPage = () => {
-    const { authState, login,loginWithGoogle } = useContext(AuthContext);
-    const [form, setForm] = useState(initialForm);
+    const { authState, login, loginWithGoogle } = useContext(AuthContext);
+    const [form, setForm] = useState({ email: "", password: "" });
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [attempt, setAttempt] = useState(0);
     const navigate = useNavigate();
     const location = useLocation();
-    const { email, password } = form;
 
-    const onSignIn = async () => {
-        const result = await login(email, password);
-        console.log(authState)
-        if (result) {
-            navigate('/', { replace: true })
-        }
-    }
+    const onSignIn = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (loading) return;
+        setLoading(true);
+        setAttempt(current => current + 1);
+        try {
+            if (await login(form.email.trim(), form.password)) navigate("/", { replace: true });
+        } finally { setLoading(false); }
+    };
 
-    const onInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const input = event.target
-        setForm({
-            ...form,
-            [input.name]: input.value
-        })
-    }
-
-    const onGoogleSignIn = async () => { 
-        const result = await loginWithGoogle();
-         if (result) {
-            navigate('/', { replace: true })
-        }
-     }
+    const onGoogleSignIn = async () => {
+        if (loading) return;
+        setLoading(true);
+        setAttempt(current => current + 1);
+        try {
+            if (await loginWithGoogle()) navigate("/", { replace: true });
+        } finally { setLoading(false); }
+    };
 
     return (
-        <>
-            <div className="container-fluid">
-                {location.state?.registered && <Alert type="success" message="Cuenta creada correctamente. Ya puedes iniciar sesión." />}
-                <div className="row min-vh-100">
-                    <div className="col-md-6" aria-hidden="true"></div>
-                    <div className="col-12 col-md-6 d-flex align-items-center justify-content-center p-4">
-                        <form className="w-100" style={{ maxWidth: "350px" }}>
-                            <div data-mdb-input-init className="form-outline mb-4">
-                                <input type="email" id="form2Example1" className="form-control" name="email" onChange={onInputChange} />
-                                <label className="form-label">Email address</label>
-                            </div>
-
-                            <div data-mdb-input-init className="form-outline mb-4">
-                                <input type="password" id="form2Example2" className="form-control" name="password" onChange={onInputChange} />
-                                <label className="form-label">Password</label>
-                            </div>
-
-                            <button type="button" className="btn btn-primary btn-block mb-4"
-                                onClick={onSignIn}>Sign in</button>
-
-                            {authState.errorMessage && (
-                                <div className="alert alert-danger" role="alert">
-                                    {authState.errorMessage}
-                                </div>
-                            )}
-
-                            <div className="text-center">
-                                <p>Not a member? <Link to="/register">Register</Link></p>
-                                <p>or sign up with:</p>
-                               
-                                <button onClick={onGoogleSignIn} type="button" className="btn  btn-floating mx-1">
-                                    <i className="fab fa-google"></i>
-                                </button>
-                                
-                            </div>
-                        </form>
+        <AuthLayout active="login">
+            {location.state?.registered && attempt === 0 && <Alert type="success" message="Cuenta creada correctamente. Ya puedes iniciar sesión." />}
+            {!loading && attempt > 0 && authState.errorMessage && <Alert key={attempt} type="danger" message={authState.errorMessage} />}
+            <button onClick={onGoogleSignIn} type="button" className="btn auth-google w-100 mb-3" disabled={loading}>
+                <AuthIcon name="google" /> Continuar con Google
+            </button>
+            <div className="d-flex align-items-center gap-3 mb-3" aria-hidden="true">
+                <hr className="flex-grow-1" /><span>O</span><hr className="flex-grow-1" />
+            </div>
+            <form onSubmit={onSignIn}>
+                <div className="mb-3">
+                    <label htmlFor="login-email" className="visually-hidden">Correo electrónico</label>
+                    <div className="input-group auth-field">
+                        <span className="input-group-text"><AuthIcon name="mail" /></span>
+                    <input id="login-email" type="email" className="form-control" name="email" placeholder="nombre@correo.com"
+                        autoComplete="username" value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} required />
                     </div>
                 </div>
-            </div>
-        </>
-    )
-}
+                <div className="mb-4">
+                    <label htmlFor="login-password" className="visually-hidden">Contraseña</label>
+                    <div className="input-group auth-field">
+                        <span className="input-group-text"><AuthIcon name="lock" /></span>
+                        <input id="login-password" type={showPassword ? "text" : "password"} className="form-control"
+                            autoComplete="current-password" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })}
+                            placeholder="Contraseña" required />
+                        <button className="btn auth-show" type="button" onClick={() => setShowPassword(!showPassword)} aria-pressed={showPassword} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                            <AuthIcon name="eye" />
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" className="btn auth-submit w-100" disabled={loading}>{loading ? "Ingresando..." : "CONTINUAR"}</button>
+            </form>
+        </AuthLayout>
+    );
+};
 
 

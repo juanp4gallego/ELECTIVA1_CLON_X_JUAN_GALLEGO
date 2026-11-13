@@ -1,8 +1,10 @@
+export interface TweetAttachment { name: string; url: string; type: "image" | "video" | "file"; }
 export interface Tweet {
     id: string;
     userId: string;
     message: string;
     createdAt: string;
+    attachment?: TweetAttachment;
 }
 export interface TweetState {
     tweets: Tweet[];
@@ -12,3 +14,4 @@ export interface TweetState {
 export type TweetResult =
     | { ok: true; tweet: Tweet }
     | { ok: false; errorMessage: string };
+

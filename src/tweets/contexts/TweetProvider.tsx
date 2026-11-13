@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { TweetContext } from "./TweetContext";
 import { publishTweet as publishTweetByMessage } from "../providers/providers";
-import type { TweetState } from "../types/TweetInterfaces";
+import type { TweetAttachment, TweetState } from "../types/TweetInterfaces";
 
 const initialState: TweetState = {
     tweets: [],
@@ -16,9 +16,9 @@ interface TweetProviderProps {
 export const TweetProvider = ({ children }: TweetProviderProps) => {
     const [tweetState, setTweetState] = useState(initialState);
 
-    const publishTweet = async (message: string, userId: string): Promise<boolean> => {
+    const publishTweet = async (message: string, userId: string, attachment?: TweetAttachment): Promise<boolean> => {
         try {
-            const result = await publishTweetByMessage(message, userId);
+            const result = await publishTweetByMessage(message, userId, attachment);
             if (result.ok === true) {
                 setTweetState(current => ({
                     tweets: [result.tweet, ...current.tweets],
@@ -54,3 +54,4 @@ export const TweetProvider = ({ children }: TweetProviderProps) => {
         </TweetContext.Provider>
     );
 };
+

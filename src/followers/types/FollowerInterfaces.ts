@@ -13,3 +13,8 @@ export interface FollowResult {
     ok: boolean;
     errorMessage: string | null;
 }
+
+export interface FollowersContextValue {
+    followersState: FollowersState;
+    followUser: (uid: string) => Promise<boolean>;
+}

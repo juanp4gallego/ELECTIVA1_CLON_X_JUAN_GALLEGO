@@ -1,45 +1,31 @@
-import { useContext } from "react"
-import { Link, NavLink, useNavigate } from "react-router-dom"
-import { AuthContext } from "../../auth/contexts/AuthContext"
+import { PostModal } from "./PostModal";
+import { FollowRecommendations } from "./FollowRecommendations";
+import { useContext, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../auth/contexts/AuthContext";
 
 export const NavBar = () => {
     const { authState, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-
-    const onLogoutButton = async () => {
-        if (await logout()) navigate("/login", { replace: true });
-    };
-
-
+    const [showPostModal, setShowPostModal] = useState(false);
+    const onLogout = async () => { if (await logout()) navigate("/login", { replace: true }); };
     return (
-        <nav className="navbar bg-1 fg-2 border-bottom shadow-sm py-3" aria-label="Navegación principal">
-            <div className="container-fluid d-flex align-items-center gap-3 flex-wrap">
-                <Link to="/" className="navbar-brand fw-bold">Clon X</Link>
-                <ul className="navbar-nav d-flex flex-row flex-wrap align-items-center gap-3">
-                    <li className="nav-item"><NavLink to="/" end className="nav-link">Inicio</NavLink></li>
-                    <li className="nav-item"><NavLink to="/feed" className="nav-link">Feed</NavLink></li>
-                    <li className="nav-item"><NavLink to="/seguidos" className="nav-link">Seguidos</NavLink></li>
-                    <li className="nav-item"><NavLink to="/seguidores" className="nav-link">Seguidores</NavLink></li>
-                    <li className="nav-item"><NavLink to={`/usuarios/${authState.user?.uid}/tweets`} className="nav-link">Mis tweets</NavLink></li>
-                    <li className="nav-item">
-                        <Link to="/tweet" className="btn theme-primary rounded-pill px-4">Tweet</Link>
-                    </li>
-                </ul>
-                <div className="d-flex align-items-center gap-3" style={{ marginInlineStart: "auto" }}>
-                    {authState.logged ? (
-                        <>
-                            <span className ="avatar">
-                                <img  className ="avatar-img" src={authState.user?.photoURL} alt="mdo" />
-                            </span>
-                            <span className="fw-semibold">{authState.user?.username || authState.user?.email}</span>
-                            <button className="btn-outline theme-danger rounded-pill px-3" type="button" onClick={onLogoutButton}>Salir</button>
-                        </>
-                    ) : (
-                        <Link to="/login" className="btn-outline theme-primary rounded-pill px-3">Ingresar</Link>
-                    )}
-                </div>
+        <aside className="interact-sidebar">
+            <Link to="/" className="interact-brand"><span>INTER</span>ACT</Link>
+            <nav className="nav flex-column gap-2" aria-label="Menú principal">
+                <NavLink to={`/usuarios/${authState.user?.uid}/tweets`} className="nav-link">♙ <span>Mi Perfil</span></NavLink>
+                <NavLink to="/feed" className="nav-link">☷ <span>Feed</span></NavLink>
+                <NavLink to="/follow" className="nav-link">♧ <span>Follow</span></NavLink>
+            </nav>
+            <button type="button" className="btn interact-button rounded-pill w-100 mt-4" onClick={() => setShowPostModal(true)}>Postear</button>
+            {showPostModal && <PostModal onClose={() => setShowPostModal(false)} />}
+            <FollowRecommendations />
+            <div className="sidebar-account">
+                <p className="small text-break">{authState.user?.username || authState.user?.email}</p>
+                <button className="btn post-secondary w-100" onClick={onLogout}>Salir</button>
             </div>
-        </nav>
+        </aside>
     );
-}
+};
+
 
