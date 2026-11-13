@@ -1,0 +1,14 @@
+import type { FeedState } from "../types/FeedInterfaces";
+import type { FeedReducerAction } from "../types/FeedReducerInterfaces";
+import { ACCION_TYPES } from "./actionTypes";
+
+export const FeedReducer = (state: FeedState, action: FeedReducerAction): FeedState => {
+    switch (action.type) {
+        case ACCION_TYPES.error:
+            return { ...state, ...action.payload };
+        case ACCION_TYPES.load:
+            return { ...state, ...action.payload };
+        default:
+            return state;
+    }
+};

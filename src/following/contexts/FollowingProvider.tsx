@@ -1,45 +1,21 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useContext, useEffect, useReducer, type ReactNode } from "react";
 import { FollowingContext } from "./FollowingContext";
-import { getFollowedUsers } from "../providers/providers";
+import { FollowingReducer } from "../reducers/FollowingReducer";
+import { ACCION_TYPES } from "../reducers/actionTypes";
+import { FollowersContext } from "../../followers/contexts/FollowersContext";
 import type { FollowingState } from "../types/FollowingInterfaces";
 
-const initialState: FollowingState = {
-    users: [],
-    loading: true,
-    errorMessage: null,
-};
+const initialState: FollowingState = { users: [], loading: true, errorMessage: null };
 
-interface FollowingProviderProps {
-    children: ReactNode;
-}
-
-export const FollowingProvider = ({ children }: FollowingProviderProps) => {
-    const [followingState, setFollowingState] = useState(initialState);
-
+export const FollowingProvider = ({ children }: { children: ReactNode }) => {
+    const { followersState } = useContext(FollowersContext);
+    const [followingState, dispatch] = useReducer(FollowingReducer, initialState);
     useEffect(() => {
-        let active = true;
-        const loadUsers = async () => {
-            try {
-                const result = await getFollowedUsers();
-                if (!active) return;
-                if (result.ok === true) {
-                    setFollowingState({ users: result.users, loading: false, errorMessage: null });
-                } else {
-                    setFollowingState({ users: [], loading: false, errorMessage: result.errorMessage });
-                }
-            } catch {
-                if (active) setFollowingState({
-                    users: [], loading: false, errorMessage: "No se pudieron cargar los usuarios seguidos.",
-                });
-            }
-        };
-        void loadUsers();
-        return () => { active = false; };
-    }, []);
-
-    return (
-        <FollowingContext.Provider value={followingState}>
-            {children}
-        </FollowingContext.Provider>
-    );
+        dispatch({ type: ACCION_TYPES.load, payload: {
+            users: followersState.following,
+            loading: followersState.loading,
+            errorMessage: followersState.errorMessage,
+        } });
+    }, [followersState]);
+    return <FollowingContext.Provider value={followingState}>{children}</FollowingContext.Provider>;
 };

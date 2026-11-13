@@ -1,15 +1,19 @@
-import { useContext, useEffect, useState, type ReactNode } from "react";
+import { HomeReducer } from "../reducers/HomeReducer";
+import { ACCION_TYPES } from "../reducers/actionTypes";
+import { useContext, useEffect, useReducer, type ReactNode } from "react";
 import { AuthContext } from "../../auth/contexts/AuthContext";
 import { HomeContext } from "./HomeContext";
 import { getHomeStats } from "../providers/providers";
 import type { HomeContextValue } from "../types/HomeInterfaces";
 
 
+const initialState: HomeContextValue = {
+        stats: null, loading: true, errorMessage: null,
+    };
+
 export const HomeProvider = ({ children }: { children: ReactNode }) => {
     const { authState } = useContext(AuthContext);
-    const [state, setState] = useState<HomeContextValue>({
-        stats: null, loading: true, errorMessage: null,
-    });
+    const [state, dispatch] = useReducer(HomeReducer, initialState);
     const userId = authState.user?.uid ?? "";
 
     useEffect(() => {
@@ -19,12 +23,12 @@ export const HomeProvider = ({ children }: { children: ReactNode }) => {
                 const result = await getHomeStats(userId);
                 if (!active) return;
                 if (result.ok === true) {
-                    setState({ stats: result.stats, loading: false, errorMessage: null });
+                    dispatch({ type: ACCION_TYPES.load, payload: { stats: result.stats, loading: false, errorMessage: null } });
                 } else {
-                    setState({ stats: null, loading: false, errorMessage: result.errorMessage });
+                    dispatch({ type: ACCION_TYPES.load, payload: { stats: null, loading: false, errorMessage: result.errorMessage } });
                 }
             } catch {
-                if (active) setState({ stats: null, loading: false, errorMessage: "No se pudieron cargar los contadores." });
+                if (active) dispatch({ type: ACCION_TYPES.load, payload: { stats: null, loading: false, errorMessage: "No se pudieron cargar los contadores." } });
             }
         };
         loadStats();
