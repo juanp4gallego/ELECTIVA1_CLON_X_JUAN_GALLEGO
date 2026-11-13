@@ -1,3 +1,4 @@
+import { FollowPage } from "../followers/pages/FollowPage";
 import { useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthContext } from "../auth/contexts/AuthContext";
@@ -36,7 +37,7 @@ export const BaseRouter = () => {
                 <Route path="/" element={<FeedProvider><FeedPage /></FeedProvider>} />
                 <Route path="/feed" element={<FeedProvider><FeedPage /></FeedProvider>} />
                 <Route path="/tweet" element={<PublishTweetPage />} />
-                <Route path="/follow" element={<FollowingProvider><FollowingPage /></FollowingProvider>} />
+                <Route path="/follow" element={<FollowPage />} />
                 <Route path="/seguidos" element={<FollowingProvider><FollowingPage /></FollowingProvider>} />
                 <Route path="/seguidores" element={<FollowersPage />} />
                 <Route path="/usuarios/:userId/tweets" element={<UserTweetsProvider><UserTweetsPage /></UserTweetsProvider>} />
@@ -45,4 +46,5 @@ export const BaseRouter = () => {
 
     );
 };
+
 

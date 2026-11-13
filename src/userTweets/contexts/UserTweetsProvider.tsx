@@ -1,4 +1,8 @@
-import { useContext, useEffect, useState, type ReactNode } from "react";
+import { FollowersContext } from "../../followers/contexts/FollowersContext";
+import { FirebaseError } from "firebase/app";
+import { UserTweetsReducer } from "../reducers/UserTweetsReducer";
+import { ACCION_TYPES } from "../reducers/actionTypes";
+import { useContext, useEffect, useReducer, type ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../../auth/contexts/AuthContext";
 import { TweetContext } from "../../tweets/contexts/TweetContext";
@@ -8,13 +12,16 @@ import { UserTweetsContext } from "./UserTweetsContext";
 import { getUserProfile, getUserTweets, followProfile } from "../providers/providers";
 import type { UserTweetsState } from "../types/UserTweetsInterfaces";
 
+const initialState: UserTweetsState = {
+        profile: null, tweets: [], loading: true, errorMessage: null,
+    };
+
 export const UserTweetsProvider = ({ children }: { children: ReactNode }) => {
+    const { followersState } = useContext(FollowersContext);
     const { userId = "" } = useParams();
     const { authState } = useContext(AuthContext) as { authState: AuthState };
     const { tweetState } = useContext(TweetContext) as { tweetState: TweetState };
-    const [state, setState] = useState<UserTweetsState>({
-        profile: null, tweets: [], loading: true, errorMessage: null,
-    });
+    const [state, dispatch] = useReducer(UserTweetsReducer, initialState);
     const currentUid = authState.user?.uid ?? "";
     const currentName = authState.user?.username || authState.user?.email || "Usuario";
 
@@ -26,35 +33,36 @@ export const UserTweetsProvider = ({ children }: { children: ReactNode }) => {
                 const savedTweets = await getUserTweets(userId);
                 if (!active) return;
                 if (!profile) {
-                    setState({ profile: null, tweets: [], loading: false, errorMessage: "Usuario no encontrado." });
+                    dispatch({ type: ACCION_TYPES.load, payload: { profile: null, tweets: [], loading: false, errorMessage: "Usuario no encontrado." } });
                     return;
                 }
-                const tweets = [...savedTweets, ...tweetState.tweets.filter(tweet => tweet.userId === userId)];
-                tweets.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-                setState({ profile, tweets, loading: false, errorMessage: null });
-            } catch {
-                if (active) setState({ profile: null, tweets: [], loading: false, errorMessage: "No se pudo cargar el usuario." });
+                const tweets = savedTweets;
+                tweets.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+                dispatch({ type: ACCION_TYPES.load, payload: { profile, tweets, loading: false, errorMessage: null } });
+            } catch (error) {
+                const errorMessage = error instanceof FirebaseError && error.code === "permission-denied"
+                    ? "No tienes permiso para consultar estos tweets. Revisa las reglas de lectura de Firestore."
+                    : "No se pudieron consultar los tweets. Revisa tu conexión e intenta nuevamente.";
+                if (active) dispatch({ type: ACCION_TYPES.error, payload: { profile: null, tweets: [], loading: false, errorMessage } });
             }
         };
         void loadUser();
         return () => { active = false; };
-    }, [userId, currentUid, currentName, tweetState.tweets]);
+    }, [userId, currentUid, currentName, tweetState.tweets, followersState]);
 
     const followUser = async (): Promise<boolean> => {
         if (!state.profile || state.profile.isFollowing) return false;
         try {
             const ok = await followProfile(state.profile);
-            if (ok) setState(current => ({
-                ...current,
-                profile: current.profile ? { ...current.profile, isFollowing: true, followers: current.profile.followers + 1 } : null,
-                errorMessage: null,
-            }));
+            if (ok) dispatch({ type: ACCION_TYPES.follow, payload: {} });
             return ok;
         } catch {
-            setState(current => ({ ...current, errorMessage: "No se pudo seguir al usuario." }));
+            dispatch({ type: ACCION_TYPES.error, payload: { errorMessage: "No se pudo seguir al usuario." } });
             return false;
         }
     };
 
     return <UserTweetsContext.Provider value={{ userTweetsState: state, followUser }}>{children}</UserTweetsContext.Provider>;
 };
+
+

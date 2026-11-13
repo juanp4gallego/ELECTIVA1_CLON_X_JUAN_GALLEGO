@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { FollowersContext } from "../../followers/contexts/FollowersContext";
 import type { FollowersContextValue } from "../../followers/types/FollowerInterfaces";
@@ -5,7 +6,7 @@ import type { FollowersContextValue } from "../../followers/types/FollowerInterf
 export const FollowRecommendations = () => {
     const { followersState, followUser } = useContext(FollowersContext) as FollowersContextValue;
     const [busy, setBusy] = useState(false);
-    const users = followersState.users.filter(user => !user.isFollowing).slice(0, 3);
+    const users = followersState.recommendations.slice(0, 3);
     const onFollow = async (uid: string) => {
         if (busy) return;
         setBusy(true);
@@ -18,11 +19,20 @@ export const FollowRecommendations = () => {
             {followersState.errorMessage && <p className="small" role="alert">{followersState.errorMessage}</p>}
             {users.map(user => (
                 <div className="recommendation-row" key={user.uid}>
-                    <span className="recommendation-name">{user.username}</span>
+                    <Link to={`/usuarios/${user.uid}/tweets`} className="recommendation-name post-name">{user.username}</Link>
                     <button className="btn btn-sm post-secondary" disabled={busy} onClick={() => onFollow(user.uid)}>Seguir</button>
                 </div>
             ))}
-            {!followersState.loading && users.length === 0 && <p className="small post-muted">Ya sigues a los usuarios sugeridos.</p>}
+            {!followersState.loading && !followersState.errorMessage && users.length === 0 && (
+                <p className="small post-muted">
+                    {followersState.following.length === 0
+                        ? "Todavía no hay otros perfiles disponibles para recomendar."
+                        : "No hay nuevos usuarios para seguir."}
+                </p>
+            )}
         </section>
     );
 };
+
+
+
