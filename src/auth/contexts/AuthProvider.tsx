@@ -1,3 +1,5 @@
+import { registerUserByCredentials } from "../../firebase/registerProvider";
+import type { RegisterForm } from "../types/RegisterInterfaces";
 import { onAuthStateChanged, signOut } from "firebase/auth"
 import { FirebaseAuth } from "../../firebase/config"
 import { useEffect, useReducer, useState, type ReactNode } from "react"
@@ -18,6 +20,12 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 
+    const [registrationError, setRegistrationError] = useState<string | null>(null);
+    const register = async (form: RegisterForm): Promise<boolean> => {
+        const result = await registerUserByCredentials(form);
+        setRegistrationError(result.errorMessage);
+        return result.ok;
+    };
     const [authState, dispatch] = useReducer(AuthReducer, initialState)
     const [checkingSession, setCheckingSession] = useState(true);
 
@@ -134,8 +142,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     return (
-        <AuthContext.Provider value={{ authState, checkingSession, login, logout, loginWithGoogle }}>
+        <AuthContext.Provider value={{ register, registrationError, authState, checkingSession, login, logout, loginWithGoogle }}>
             {children}
         </AuthContext.Provider>
     )
 }
+

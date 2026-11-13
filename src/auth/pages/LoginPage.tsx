@@ -1,6 +1,7 @@
+import { Alert } from "../../ui/components/Alert";
 import { useContext, useState, type ChangeEvent } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const initialForm = {
     email: '',
@@ -11,6 +12,7 @@ export const LoginPage = () => {
     const { authState, login,loginWithGoogle } = useContext(AuthContext);
     const [form, setForm] = useState(initialForm);
     const navigate = useNavigate();
+    const location = useLocation();
     const { email, password } = form;
 
     const onSignIn = async () => {
@@ -39,6 +41,7 @@ export const LoginPage = () => {
     return (
         <>
             <div className="container-fluid">
+                {location.state?.registered && <Alert type="success" message="Cuenta creada correctamente. Ya puedes iniciar sesión." />}
                 <div className="row min-vh-100">
                     <div className="col-md-6" aria-hidden="true"></div>
                     <div className="col-12 col-md-6 d-flex align-items-center justify-content-center p-4">
@@ -63,7 +66,7 @@ export const LoginPage = () => {
                             )}
 
                             <div className="text-center">
-                                <p>Not a member? <a href="#!">Register</a></p>
+                                <p>Not a member? <Link to="/register">Register</Link></p>
                                 <p>or sign up with:</p>
                                
                                 <button onClick={onGoogleSignIn} type="button" className="btn  btn-floating mx-1">
@@ -78,3 +81,5 @@ export const LoginPage = () => {
         </>
     )
 }
+
+
