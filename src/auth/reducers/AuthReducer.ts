@@ -1,10 +1,11 @@
 import type { AuthReducerAction, AuthState } from "../types/AuthReducerInterfaces";
+import { ACCION_TYPES } from './actionTypes';
 
 
 export const AuthReducer = ( state : AuthState, action : AuthReducerAction ) => {
 
     switch (action.type) {
-        case "login":
+        case ACCION_TYPES.login:
             return {
                 ... state,
                 logged : true,
@@ -12,13 +13,13 @@ export const AuthReducer = ( state : AuthState, action : AuthReducerAction ) => 
                 errorMessage: null
             }
             
-        case "logout":
+        case ACCION_TYPES.logout:
             return {
                 ...state,
                 ...action.payload
             }
         
-        case "error":
+        case ACCION_TYPES.error:
             return {
                 logged : false,
                 user : null,
