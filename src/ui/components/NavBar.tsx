@@ -28,6 +28,9 @@ export const NavBar = () => {
                 <div className="d-flex align-items-center gap-3" style={{ marginInlineStart: "auto" }}>
                     {authState.logged ? (
                         <>
+                            <span className ="avatar">
+                                <img  className ="avatar-img" src={authState.user?.photoURL} alt="mdo" />
+                            </span>
                             <span className="fw-semibold">{authState.user?.username || authState.user?.email}</span>
                             <button className="btn-outline theme-danger rounded-pill px-3" type="button" onClick={onLogoutButton}>Salir</button>
                         </>

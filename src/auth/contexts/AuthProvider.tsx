@@ -4,7 +4,8 @@ import { useEffect, useReducer, useState, type ReactNode } from "react"
 import { AuthContext } from "./AuthContext"
 import { AuthReducer } from "../reducers/AuthReducer"
 import type { AuthReducerAction, AuthState, User } from "../types/AuthReducerInterfaces"
-import { loginUserByCredentials } from "../../firebase/providers"
+import { loginUserByCredentials, loginUserByGoogleProvider } from '../../firebase/providers';
+import { ACCION_TYPES } from '../reducers/actionTypes';
 
 const initialState = {
     logged: false,
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             } as User;
 
             const action = {
-                type: "login",
+                type: ACCION_TYPES.login,
                 payload: {
                     logged: true,
                     user
@@ -66,10 +67,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             return true;
         } else {
             const action = {
-                type : 'error',
-                payload : {
-                    logged : false,
-                    user : null,
+                type: ACCION_TYPES.error,
+                payload: {
+                    logged: false,
+                    user: null,
                     errorMessage: result.errorMessage
                 }
             } as AuthReducerAction
@@ -79,25 +80,61 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     }
 
-    const logout = async () : Promise<boolean> => {
+    const logout = async (): Promise<boolean> => {
         try {
             await signOut(FirebaseAuth);
         } catch {
             return false;
         }
         dispatch({
-            type: "logout",
+            type: ACCION_TYPES.logout,
             payload: {
                 logged: false,
                 user: null,
-                errorMessage : null
+                errorMessage: null
             }
-        });
+        } as AuthReducerAction
+        );
+        return true;
+    }
+
+    const loginWithGoogle = async (): Promise<boolean> => {
+        const { ok, displayName, email, photoURL, uid, errorMessage } = await loginUserByGoogleProvider();
+
+        if (!ok) {
+            const action = {
+                type: ACCION_TYPES.error,
+                payload: {
+                    logged: false,
+                    user: null,
+                    errorMessage: errorMessage
+                }
+            } as AuthReducerAction
+
+            dispatch(action);
+        }
+        const user = {
+            uid,
+            email,
+            photoURL,
+            username: displayName,
+        } as User;
+
+        const action = {
+            type: ACCION_TYPES.login,
+            payload: {
+                logged: true,
+                user
+            }
+        } as AuthReducerAction
+
+        dispatch(action);
+
         return true;
     }
 
     return (
-        <AuthContext.Provider value={{ authState, checkingSession, login, logout }}>
+        <AuthContext.Provider value={{ authState, checkingSession, login, logout, loginWithGoogle }}>
             {children}
         </AuthContext.Provider>
     )

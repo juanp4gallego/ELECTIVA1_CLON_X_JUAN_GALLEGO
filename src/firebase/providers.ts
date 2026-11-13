@@ -1,18 +1,21 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { FirebaseAuth } from "./config";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { FirebaseAuth, FirebaseApp } from './config';
 
 interface AuthResult {
-    ok : boolean,
-    uid : string,
-    email : string,
-    displayName : string | null,
-    photoURL : string | null
+    ok: boolean,
+    uid: string,
+    email: string | null,
+    displayName: string | null,
+    photoURL: string | null
 }
 
 interface AuthErrorResult {
-    ok : boolean,
-    errorMessage : string
+    ok: boolean,
+    errorMessage: string
 }
+
+// settings
+const GoogleProvider = new GoogleAuthProvider();
 
 export const loginUserByCredentials = async (email: string, password: string): Promise<AuthResult | AuthErrorResult> => {
     try {
@@ -30,7 +33,23 @@ export const loginUserByCredentials = async (email: string, password: string): P
 
     } catch (error: any) {
         return {
-            ok: false, 
+            ok: false,
+            errorMessage: error.message
+        }
+    }
+}
+
+export const loginUserByGoogleProvider = async (): Promise<AuthResult | AuthErrorResult> => {
+    try {
+        const result = await signInWithPopup(FirebaseAuth, GoogleProvider);
+        const { displayName, email, photoURL, uid } = result.user;
+        return {
+            ok: true,
+            uid, email, displayName, photoURL
+        };
+    } catch (error: any) {
+        return {
+            ok: false,
             errorMessage: error.message
         }
     }
